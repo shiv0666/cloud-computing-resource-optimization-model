@@ -19,8 +19,21 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>github-cloudsim</id>
+            <name>GitHub CloudSim Maven Packages</name>
+            <url>https://raw.githubusercontent.com/Cloudslab/cloudsim/master</url>
+        </repository>
+    </repositories>
+
     <dependencies>
-        <!-- No external dependencies - standalone project -->
+        <!-- CloudSim Framework -->
+        <dependency>
+            <groupId>org.cloudbus.cloudsim</groupId>
+            <artifactId>cloudsim</artifactId>
+            <version>3.0.3</version>
+        </dependency>
     </dependencies>
 
     <build>

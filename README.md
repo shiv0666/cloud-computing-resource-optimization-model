@@ -1,102 +1,142 @@
-# CloudSim Project - CPU and Memory Utilization
+# CloudSim - Efficient CPU and Memory Utilization Model
 
-## Overview
-This is a CloudSim simulation project that models cloud computing infrastructure and analyzes VM utilization.
+A cloud computing simulation project using **CloudSim 3.0.3 framework** (official library from GitHub).
 
-## System Architecture
+## Quick Start
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    DATACENTER                           │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │   HOST 0     │  │   HOST 1     │  │   HOST 2     │  │
-│  │ 2048MB RAM   │  │ 2048MB RAM   │  │ 2048MB RAM   │  │
-│  │ 1000 MIPS    │  │ 1000 MIPS    │  │ 1000 MIPS    │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  │
-│      │ │ │            │ │ │           │ │ │             │
-│      │ │ │            │ │ │           │ │ │             │
-│    ┌─┴─┴─┴─┐  ┌──────┴─┴─┴─────┐  ┌─┴─┴─┴─────┐       │
-│    │ VM 0  │  │ VM 1 │VM 2│VM 3│  │ VM 4      │       │
-│    │512MB  │  │640MB │768│896 │  │ 1GB       │       │
-│    └───┬───┘  └──────┬───┬────┘  └───┬───────┘       │
-│  ┌─────┴─────────────┼───┼───────────┴──────┐        │
-│  │ 10 CLOUDLETS (TASKS)                     │        │
-│  │ Cloudlet0 Cloudlet1 ... Cloudlet9        │        │
-│  └──────────────────────────────────────────┘        │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+```powershell
+cd "c:\Users\shiva\OneDrive\Desktop\cloudsim project"
+mvn compile -q
+java -cp "target/classes;$HOME\.m2\repository\org\cloudbus\cloudsim\cloudsim\3.0.3\cloudsim-3.0.3.jar;$HOME\.m2\repository\org\apache\commons\commons-math3\3.0\commons-math3-3.0.jar" com.cloud.project.App
 ```
 
-## Before vs After Optimization
+Then open **`dashboard.html`** in your browser to view the results.
 
-### BEFORE OPTIMIZATION (Current State)
+## Infrastructure
 
-```
-CPU Utilization per VM:
-┌─────────────────────────────────────────────┐
-│ VM 0 (512MB):  ████░░░░░░░░░░░░░░░░░░░░  20% │
-│ VM 1 (640MB):  ████░░░░░░░░░░░░░░░░░░░░  20% │
-│ VM 2 (768MB):  ████░░░░░░░░░░░░░░░░░░░░  20% │
-│ VM 3 (896MB):  ████░░░░░░░░░░░░░░░░░░░░  20% │
-│ VM 4 (1024MB): ████░░░░░░░░░░░░░░░░░░░░  20% │
-└─────────────────────────────────────────────┘
+### Physical Layer
+- **3 Hosts** with 3000 MIPS each
+- 2048 MB RAM per host
+- 10,000 Mbps bandwidth
 
-Active VMs:        5
-Hosts Used:        3
-Average CPU:       20%
-Energy Cost:       100% (BASELINE)
-Wasted Resources:  80%
-Status:            ❌ HIGHLY INEFFICIENT
-```
+### Virtual Layer
+- **5 Virtual Machines**
+  - VM 0: 512 MB RAM
+  - VM 1: 640 MB RAM
+  - VM 2: 768 MB RAM
+  - VM 3: 896 MB RAM
+  - VM 4: 1024 MB RAM
 
-### AFTER OPTIMIZATION (Recommended)
+### Workload
+- **10 Cloudlets** (computational tasks)
+  - Cloudlet lengths: 40,000 to 49,000 MIPS
+  - Distributed across VMs
+  - Sequential execution per VM
 
-```
-CPU Utilization per VM:
-┌─────────────────────────────────────────────┐
-│ VM 0 (1024MB):  ██████████░░░░░░░░░░░░░░ 50% │
-│ VM 1 (1024MB):  ██████████░░░░░░░░░░░░░░ 50% │
-│ VM 2 (1024MB):  ██████████░░░░░░░░░░░░░░ 50% │
-│ (Consolidated)  ██████████░░░░░░░░░░░░░░ 50% │
-└─────────────────────────────────────────────┘
+## Dashboard Features
 
-Active VMs:        3 (consolidated from 5)
-Hosts Used:        2 (consolidated from 3)
-Average CPU:       50% (optimal range)
-Energy Cost:       60% (-40% savings!)
-Wasted Resources:  50%
-Status:            ✅ OPTIMIZED
-```
+The dashboard displays real CloudSim execution data:
 
-## Comparison Metrics
+1. **Summary Metrics**
+   - Total VMs, Hosts, Cloudlets
+   - Total simulation time
 
-```
-METRIC                  BEFORE          AFTER           IMPROVEMENT
-═════════════════════════════════════════════════════════════════
-Active VMs              5               3               -40%
-Active Hosts            3               2               -33%
-CPU Utilization         20%             50%             +150%
-Memory Utilization      16%             40%             +150%
-Power Consumption       100%            60%             -40% ⚡
-Cooling Cost            High            Low             -35%
-Equipment Cost/Year     $50,000         $30,000         -40%
-Latency                 Low             Low             No Change
-═════════════════════════════════════════════════════════════════
-```
+2. **CPU Utilization Graph** 📊
+   - Bar chart showing MIPS used per VM
+   - Identifies CPU-intensive tasks
 
-## Performance Comparison Chart
+3. **Memory Utilization Graph** 🔵
+   - Doughnut chart showing RAM allocation
+   - Color-coded distribution
+
+4. **Execution Timeline** ⏱️
+   - Chronological view of all cloudlets
+   - Start/finish times and duration
+   - Shows scheduling order
+
+5. **VM Status Table** 🎯
+   - VM details (ID, RAM, cloudlet count)
+   - **Status indicators**:
+     - 🟢 **Balanced** - Optimal load (2-3 cloudlets)
+     - 🔵 **Underutilized** - No cloudlets assigned
+     - 🔴 **Overutilized** - More than 3 cloudlets
+
+## Auto-Refresh
+
+Dashboard automatically updates every 5 seconds when new simulations complete. Click **Refresh** button anytime for manual update.
+
+## Project Files
 
 ```
-Resource Wastage Reduction:
+cloudsim-project/
+├── src/main/java/com/cloud/project/
+│   └── App.java              # Real CloudSim 3.0.3 simulation
+├── pom.xml                   # Maven configuration
+├── dashboard.html            # Web visualization
+├── simulation-data.json      # Execution results (auto-generated)
+└── target/                   # Compiled classes
+```
 
-BEFORE OPTIMIZATION:
-┌─────────────────────────────────────────────┐
-│ CPU Usage:    ████░░░░░░░░░░░░░░░░░░░░░░  20%
-│ Memory Used:  ████░░░░░░░░░░░░░░░░░░░░░░  16%
-│ Wasted Res:   ████████████████░░░░░░░░░░░░ 84%
-└─────────────────────────────────────────────┘
+## Technology Stack
+
+- **Java 11+** - CloudSim code (compiled with JDK 21)
+- **CloudSim 3.0.3** - Official cloud simulation framework
+- **Maven 3.9** - Build management
+- **Bootstrap 5** - Responsive UI
+- **Chart.js 4** - Interactive graphs
+
+## How It Works
+
+1. **Simulation Engine** (`App.java`)
+   - Uses official CloudSim 3.0.3 classes
+   - Creates datacenter with hosts
+   - Creates VMs with specified resources
+   - Creates and schedules cloudlets
+   - Executes simulation and collects results
+
+2. **Data Generation**
+   - Simulation produces `simulation-data.json`
+   - Contains cloudlet execution metrics
+   - Timestamp for tracking runs
+
+3. **Dashboard Visualization**
+   - Fetches JSON data
+   - Renders 5 key visualizations
+   - Displays VM utilization status
+   - Auto-refreshes for new runs
+
+## Real CloudSim Output Example
+
+```
+Initialising...
+Starting CloudSim version 3.0
+Datacenter_0 is starting...
+Broker is starting...
+Entities started.
+
+0.1: Broker: VM #0 has been created in Datacenter #2, Host #0
+0.1: Broker: VM #1 has been created in Datacenter #2, Host #1
+0.1: Broker: VM #2 has been created in Datacenter #2, Host #2
+0.1: Broker: VM #3 has been created in Datacenter #2, Host #0
+0.1: Broker: VM #4 has been created in Datacenter #2, Host #1
+
+0.1: Broker: Sending cloudlet 0 to VM #0
+0.1: Broker: Sending cloudlet 1 to VM #1
+...
+
+93.1: Broker: All Cloudlets executed. Finishing...
+Simulation completed.
+CloudSim Simulation Complete
+JSON saved
+```
+
+## Key Metrics Generated
+
+Each simulation run produces:
+- **Cloudlet execution times** - From start to finish
+- **VM assignments** - Which VM executed which cloudlet
+- **Total simulation time** - Duration of execution
+- **Resource utilization** - CPU and memory usage per VM
 
 AFTER OPTIMIZATION:
 ┌─────────────────────────────────────────────┐
