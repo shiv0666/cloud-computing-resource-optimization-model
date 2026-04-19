@@ -159,6 +159,54 @@
             color: #dc3545;
             font-weight: 700;
         }
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .insight-box {
+            background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .insight-label {
+            color: #495057;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+        .insight-value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #1f2d3d;
+        }
+        .insight-text {
+            margin-top: 14px;
+            color: #4f5d73;
+            line-height: 1.55;
+        }
+        .insight-pill {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-top: 10px;
+        }
+        .pill-up {
+            background: #fff3cd;
+            color: #8a6d00;
+        }
+        .pill-down {
+            background: #d1e7dd;
+            color: #146c43;
+        }
+        .pill-neutral {
+            background: #e2e3e5;
+            color: #41464b;
+        }
         .timeline-item {
             padding: 12px;
             background: #f8f9fa;
@@ -244,6 +292,16 @@
             </div>
             <div class="chart-container">
                 <canvas id="scalabilityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Scalability Insights -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-lightbulb"></i> Scalability Insights
+            </div>
+            <div id="scalabilityInsights">
+                <!-- Insight content will be inserted here -->
             </div>
         </div>
 
@@ -342,6 +400,7 @@
             updateCPUChart();
             updateMemoryChart();
             updateScalabilityChart();
+            updateScalabilityInsights();
             updateTimeline();
             updateVMTable();
             updateComparisonTable();
@@ -498,6 +557,52 @@
                     }
                 }
             });
+        }
+
+        function updateScalabilityInsights() {
+            const scalability = simulationData.scalability || [];
+            const container = document.getElementById('scalabilityInsights');
+
+            if (!scalability.length) {
+                container.innerHTML = '<div class="text-muted">No scalability data available yet.</div>';
+                return;
+            }
+
+            const first = scalability[0];
+            const last = scalability[scalability.length - 1];
+            const makespanChange = ((last.makespan - first.makespan) / first.makespan) * 100;
+            const throughputChange = ((last.throughput - first.throughput) / first.throughput) * 100;
+            const avgTimeChange = ((last.avgTime - first.avgTime) / first.avgTime) * 100;
+
+            const trendLabel = makespanChange > 0 ? 'Execution time grows with workload' : 'Execution time stays stable';
+            const throughputLabel = throughputChange < 0 ? 'Throughput declines as cloudlets increase' : 'Throughput improves as cloudlets increase';
+            const stabilityLabel = avgTimeChange > 0 ? 'Per-cloudlet latency rises under load' : 'Per-cloudlet latency remains stable';
+
+            container.innerHTML = `
+                <div class="insight-grid">
+                    <div class="insight-box">
+                        <div class="insight-label">Makespan Growth</div>
+                        <div class="insight-value">${makespanChange.toFixed(2)}%</div>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-label">Throughput Change</div>
+                        <div class="insight-value">${throughputChange.toFixed(2)}%</div>
+                    </div>
+                    <div class="insight-box">
+                        <div class="insight-label">Average Time Change</div>
+                        <div class="insight-value">${avgTimeChange.toFixed(2)}%</div>
+                    </div>
+                </div>
+                <div class="insight-text">
+                    Across ${first.cloudlets} to ${last.cloudlets} cloudlets, the system shows a clear scalability pattern.
+                    ${trendLabel}. ${throughputLabel}. ${stabilityLabel}.
+                </div>
+                <div>
+                    <span class="insight-pill ${makespanChange > 0 ? 'pill-up' : 'pill-neutral'}">Makespan ${makespanChange > 0 ? 'increases' : 'stable'}</span>
+                    <span class="insight-pill ${throughputChange < 0 ? 'pill-down' : 'pill-neutral'}">Throughput ${throughputChange < 0 ? 'drops' : 'stable'}</span>
+                    <span class="insight-pill ${avgTimeChange > 0 ? 'pill-up' : 'pill-neutral'}">Latency ${avgTimeChange > 0 ? 'rises' : 'stable'}</span>
+                </div>
+            `;
         }
 
         function updateTimeline() {
